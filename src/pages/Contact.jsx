@@ -35,6 +35,44 @@ const Contact = () => {
     setSubmitStatus(null)
 
     try {
+      // 检查EmailJS配置
+      const serviceId = import.meta.env.VITE_EMAILJS_SERVICE_ID
+      const templateId = import.meta.env.VITE_EMAILJS_TEMPLATE_ID
+      const publicKey = import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+
+      // 如果是测试配置，显示配置提示
+      if (serviceId === 'test_service' || templateId === 'test_template' || publicKey === 'test_key') {
+        console.warn('EmailJS is using test configuration. Please setup real EmailJS credentials.')
+
+        // 模拟成功发送，但显示配置提示
+        setSubmitStatus('config_needed')
+
+        // 清空表单
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          service: '',
+          message: ''
+        })
+
+        // 5秒后清除状态
+        setTimeout(() => {
+          setSubmitStatus(null)
+        }, 5000)
+
+        setLoading(false)
+        return
+      }
+
+      // 检查必要配置是否存在
+      if (!serviceId || !templateId || !publicKey) {
+        console.error('EmailJS configuration is missing')
+        setSubmitStatus('config_missing')
+        setLoading(false)
+        return
+      }
+
       // 准备邮件模板参数
       const templateParams = {
         from_name: formData.name,
@@ -48,10 +86,10 @@ const Contact = () => {
 
       // 发送邮件
       const result = await emailjs.send(
-        import.meta.env.VITE_EMAILJS_SERVICE_ID,
-        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        serviceId,
+        templateId,
         templateParams,
-        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+        publicKey
       )
 
       console.log('Email sent successfully:', result)
@@ -73,7 +111,24 @@ const Contact = () => {
 
     } catch (error) {
       console.error('Email send failed:', error)
-      setSubmitStatus('error')
+      console.log('Error details:', {
+        serviceId: import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        templateId: import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        hasPublicKey: !!import.meta.env.VITE_EMAILJS_PUBLIC_KEY,
+        errorMessage: error.message,
+        errorCode: error.code
+      })
+
+      // 根据错误类型显示不同提示
+      if (error.message?.includes('Invalid public key') || error.code === 'INVALID_PUBLIC_KEY') {
+        setSubmitStatus('invalid_key')
+      } else if (error.message?.includes('Service not found') || error.code === 'SERVICE_NOT_FOUND') {
+        setSubmitStatus('service_not_found')
+      } else if (error.message?.includes('Template not found') || error.code === 'TEMPLATE_NOT_FOUND') {
+        setSubmitStatus('template_not_found')
+      } else {
+        setSubmitStatus('error')
+      }
 
       // 5秒后清除错误状态
       setTimeout(() => {
@@ -261,6 +316,31 @@ const Contact = () => {
               {submitStatus === 'success' && (
                 <div className="p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">
                   ✓ 消息发送成功！我们会尽快与您联系。
+                </div>
+              )}
+              {submitStatus === 'config_needed' && (
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-700 text-sm">
+                  ⚠️ 表单已提交！邮件功能需要配置EmailJS，请参考部署指南完成配置。
+                </div>
+              )}
+              {submitStatus === 'config_missing' && (
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-xl text-yellow-700 text-sm">
+                  ⚠️ EmailJS配置缺失，请在环境变量中添加VITE_EMAILJS_*相关配置。
+                </div>
+              )}
+              {submitStatus === 'invalid_key' && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+                  ✗ EmailJS公钥无效，请检查VITE_EMAILJS_PUBLIC_KEY配置。
+                </div>
+              )}
+              {submitStatus === 'service_not_found' && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+                  ✗ EmailJS服务未找到，请检查VITE_EMAILJS_SERVICE_ID配置。
+                </div>
+              )}
+              {submitStatus === 'template_not_found' && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+                  ✗ EmailJS模板未找到，请检查VITE_EMAILJS_TEMPLATE_ID配置。
                 </div>
               )}
               {submitStatus === 'error' && (
