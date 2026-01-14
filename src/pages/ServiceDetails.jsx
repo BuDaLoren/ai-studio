@@ -188,6 +188,53 @@ const serviceDetails = {
       { step: '05', title: '测试调优', desc: '功能测试，性能优化' },
       { step: '06', title: '发布维护', desc: '正式发布，持续维护' }
     ]
+  },
+  deployment: {
+    id: 'deployment',
+    title: 'AI部署',
+    subtitle: '专业AI模型部署服务',
+    description: '专业的AI模型部署服务，从云端到边缘设备，提供端到端的部署解决方案，让您的AI应用快速落地',
+    icon: (
+      <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+      </svg>
+    ),
+    features: [
+      {
+        title: '云端模型部署',
+        description: '基于云平台的AI模型部署，提供弹性计算资源和自动扩缩容',
+        items: ['容器化部署', 'Kubernetes编排', '自动扩缩容', '负载均衡']
+      },
+      {
+        title: '边缘设备部署',
+        description: '在边缘设备上部署AI模型，实现低延迟实时推理',
+        items: ['模型优化', '边缘计算框架', '硬件适配', '远程管理']
+      },
+      {
+        title: '性能优化调优',
+        description: '对AI模型进行性能优化，提升推理速度和资源利用率',
+        items: ['模型量化', '剪枝优化', '算子融合', '内存优化']
+      },
+      {
+        title: '监控运维支持',
+        description: '全面的监控和运维体系，保障AI服务稳定运行',
+        items: ['性能监控', '日志分析', '故障告警', '健康检查']
+      }
+    ],
+    applications: [
+      { name: '企业AI平台', desc: '企业内部AI能力平台，支持多模型多业务' },
+      { name: '智能物联网', desc: '物联网设备AI赋能，边缘智能决策' },
+      { name: '实时推理服务', desc: '高并发实时AI推理，毫秒级响应' },
+      { name: 'AIGC应用', desc: '生成式AI应用部署，稳定高效服务' }
+    ],
+    process: [
+      { step: '01', title: '需求评估', desc: '分析业务场景和性能需求' },
+      { step: '02', title: '方案设计', desc: '制定部署架构和技术方案' },
+      { step: '03', title: '模型优化', desc: '模型压缩和性能调优' },
+      { step: '04', title: '环境部署', desc: '搭建生产环境和部署流水线' },
+      { step: '05', title: '测试验证', desc: '性能测试和稳定性验证' },
+      { step: '06', title: '运维支持', desc: '持续监控和优化维护' }
+    ]
   }
 }
 

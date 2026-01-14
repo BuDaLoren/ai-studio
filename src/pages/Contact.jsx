@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import emailjs from '@emailjs/browser'
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +9,18 @@ const Contact = () => {
     service: '',
     message: ''
   })
+  const [loading, setLoading] = useState(false)
+  const [submitStatus, setSubmitStatus] = useState(null) // 'success', 'error', null
+
+  // 服务ID到名称的映射
+  const serviceMap = {
+    device: 'AI设备定制',
+    medical: 'AI医疗',
+    pet: 'AI宠物',
+    assistant: 'AI桌面管家',
+    deployment: 'AI部署',
+    other: '其他需求'
+  }
 
   const handleChange = (e) => {
     setFormData({
@@ -16,16 +29,59 @@ const Contact = () => {
     })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    alert('感谢您的留言！我们会尽快与您联系。')
-    setFormData({
-      name: '',
-      email: '',
-      phone: '',
-      service: '',
-      message: ''
-    })
+    setLoading(true)
+    setSubmitStatus(null)
+
+    try {
+      // 准备邮件模板参数
+      const templateParams = {
+        from_name: formData.name,
+        from_email: formData.email,
+        phone: formData.phone,
+        service: serviceMap[formData.service] || formData.service,
+        message: formData.message,
+        to_email: import.meta.env.VITE_RECEIVER_EMAIL || 'rendaloren@outlook.com',
+        date: new Date().toLocaleString('zh-CN')
+      }
+
+      // 发送邮件
+      const result = await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
+        templateParams,
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      )
+
+      console.log('Email sent successfully:', result)
+
+      setSubmitStatus('success')
+      // 清空表单
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        service: '',
+        message: ''
+      })
+
+      // 5秒后清除成功状态
+      setTimeout(() => {
+        setSubmitStatus(null)
+      }, 5000)
+
+    } catch (error) {
+      console.error('Email send failed:', error)
+      setSubmitStatus('error')
+
+      // 5秒后清除错误状态
+      setTimeout(() => {
+        setSubmitStatus(null)
+      }, 5000)
+    } finally {
+      setLoading(false)
+    }
   }
 
   const contactInfo = [
@@ -177,11 +233,12 @@ const Contact = () => {
                   className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all"
                 >
                   <option value="">请选择服务类型</option>
-                  <option value="设备定制">AI设备定制</option>
-                  <option value="AI医疗">AI医疗</option>
-                  <option value="AI宠物">AI宠物</option>
-                  <option value="桌面管家">AI桌面管家</option>
-                  <option value="其他">其他需求</option>
+                  <option value="device">AI设备定制</option>
+                  <option value="medical">AI医疗</option>
+                  <option value="pet">AI宠物</option>
+                  <option value="assistant">AI桌面管家</option>
+                  <option value="deployment">AI部署</option>
+                  <option value="other">其他需求</option>
                 </select>
               </div>
 
@@ -200,11 +257,26 @@ const Contact = () => {
                 />
               </div>
 
+              {/* 状态提示 */}
+              {submitStatus === 'success' && (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">
+                  ✓ 消息发送成功！我们会尽快与您联系。
+                </div>
+              )}
+              {submitStatus === 'error' && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+                  ✗ 发送失败，请稍后重试或直接通过邮箱联系我们。
+                </div>
+              )}
+
               <button
                 type="submit"
-                className="w-full px-8 py-4 bg-primary-600 text-white font-medium rounded-xl hover:bg-primary-700 transition-all shadow-soft hover:shadow-softer"
+                disabled={loading}
+                className={`w-full px-8 py-4 bg-primary-600 text-white font-medium rounded-xl transition-all shadow-soft hover:shadow-softer ${
+                  loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-primary-700'
+                }`}
               >
-                发送消息
+                {loading ? '发送中...' : '发送消息'}
               </button>
             </form>
           </div>

@@ -45,6 +45,17 @@ const Services = () => {
         </svg>
       ),
       features: ['智能语音交互', '日程任务管理', '信息快速查询', '个性化推荐']
+    },
+    {
+      id: 'deployment',
+      title: 'AI部署',
+      description: '专业的AI模型部署服务，从云端到边缘设备，提供端到端的部署解决方案，让您的AI应用快速落地',
+      icon: (
+        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+        </svg>
+      ),
+      features: ['云端模型部署', '边缘设备部署', '性能优化调优', '监控运维支持']
     }
   ]
 
@@ -58,7 +69,7 @@ const Services = () => {
               我们的服务
             </span>
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-gray-900 mb-6">
-              四大核心业务
+              五大核心业务
             </h1>
             <p className="text-lg text-gray-600">
               提供全方位的AI解决方案，满足不同行业和场景的智能化需求
